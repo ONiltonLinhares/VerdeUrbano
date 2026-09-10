@@ -24,15 +24,12 @@ Dessa forma, o problema identificado pelo projeto não é apenas a falta de áre
 ---
 
 ## 2. Necessidades e dificuldades dos usuários
-
 O público do VerdeUrbano possui diferentes necessidades.
 
 ### Moradores de áreas urbanas
-
 Precisam encontrar áreas verdes próximas de suas residências e conhecer as características desses locais antes de visitá-los.
 
 ### Idosos
-
 Podem precisar de informações relacionadas a:
 
 - Bancos para descanso;
@@ -42,7 +39,6 @@ Podem precisar de informações relacionadas a:
 - Acessibilidade.
 
 ### Famílias com crianças
-
 Precisam encontrar locais que ofereçam:
 
 - Segurança;
@@ -61,27 +57,22 @@ Necessitam saber antecipadamente se o local possui:
 Dados do **IBGE** mostram que apenas uma parcela das vias urbanas brasileiras possui estruturas adequadas de acessibilidade, tornando esse tipo de informação importante para o aplicativo.
 
 ### Profissionais ligados à saúde
-
 Profissionais como psicólogos podem utilizar informações sobre áreas verdes para recomendar atividades relacionadas ao contato com a natureza, relaxamento e bem-estar.
 
 ---
 
 ## 3. Dados que podem influenciar o aplicativo
-
 A pesquisa mostrou que apenas apresentar a localização de uma área verde pode não ser suficiente.
 
 O VerdeUrbano deve disponibilizar outras informações importantes.
 
 ### Localização
-
 O aplicativo poderá utilizar mapas para mostrar parques, praças e outras áreas verdes próximas ao usuário.
 
 ### Distância
-
 O usuário poderá visualizar quais locais estão mais próximos.
 
 ### Acessibilidade
-
 Cada local poderá possuir informações sobre:
 
 - Rampas;
@@ -90,7 +81,6 @@ Cada local poderá possuir informações sobre:
 - Banheiros adaptados.
 
 ### Segurança
-
 O aplicativo poderá apresentar informações como:
 
 - Iluminação;
@@ -99,7 +89,6 @@ O aplicativo poderá apresentar informações como:
 - Condições do local.
 
 ### Atividades disponíveis
-
 Os locais poderão ser classificados de acordo com atividades como:
 
 - Corrida;
@@ -110,7 +99,6 @@ Os locais poderão ser classificados de acordo com atividades como:
 - Contato com a natureza.
 
 ### Estrutura
-
 O aplicativo poderá informar a existência de:
 
 - Banheiros;
@@ -121,7 +109,6 @@ O aplicativo poderá informar a existência de:
 - Estacionamento.
 
 ### Avaliações dos usuários
-
 Os próprios usuários poderão compartilhar informações sobre:
 
 - Conservação;
@@ -131,7 +118,6 @@ Os próprios usuários poderão compartilhar informações sobre:
 - Qualidade do espaço.
 
 ### Funcionamento offline
-
 Como algumas áreas podem apresentar sinal de internet limitado, o aplicativo poderá permitir o download de mapas e informações para consulta offline.
 
 ---
@@ -163,47 +149,5 @@ Objetivo de Desenvolvimento Sustentável 11, relacionado à criação de cidades
 Estudos sobre a relação entre espaços verdes, saúde mental e bem-estar.
 
 - https://www.who.int/europe/publications/i/item/9789289055666
-
----
-
-# 5. Principais descobertas
-
-## 1. A maior parte da população brasileira vive em áreas urbanas
-
-Segundo o IBGE, aproximadamente **87,4% da população brasileira vive em áreas urbanas**.
-
-### Influência no projeto
-
-Isso demonstra que existe um grande público que pode se beneficiar de uma ferramenta que facilite a localização de parques, praças e outras áreas verdes dentro das cidades.
-
----
-
-## 2. Apenas mostrar a localização não é suficiente
-
-Usuários diferentes possuem necessidades diferentes relacionadas à segurança, acessibilidade e infraestrutura.
-
-### Influência no projeto
-
-O VerdeUrbano deverá permitir que os usuários encontrem locais utilizando filtros como:
-
-- Acessibilidade;
-- Segurança;
-- Atividades;
-- Estrutura;
-- Distância.
-
-Dessa forma, o aplicativo poderá oferecer resultados mais adequados para cada tipo de usuário.
-
----
-
-## 3. Áreas verdes podem contribuir para a saúde física e mental
-
-Segundo a Organização Mundial da Saúde, o contato com áreas verdes pode incentivar atividades físicas, interação social, relaxamento e redução do estresse.
-
-### Influência no projeto
-
-O VerdeUrbano poderá ir além de um simples mapa.
-
-O aplicativo poderá apresentar informações sobre as atividades disponíveis em cada espaço e incentivar os usuários a utilizarem áreas verdes como forma de melhorar sua qualidade de vida.
 
 ---
