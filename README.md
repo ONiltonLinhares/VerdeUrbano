@@ -1,8 +1,8 @@
-# 🌿 Guia Verde
+# 🌿 VerdeUrbano
 
 ## Atividade
 
-Estruturação inicial do projeto **Guia Verde**.
+Estruturação inicial do projeto **VerdeUrbano**.
 
 ---
 
@@ -22,7 +22,7 @@ Estruturação inicial do projeto **Guia Verde**.
 
 ## 📱 Sobre a atividade
 
-A atividade teve como objetivo definir e estruturar os principais elementos iniciais do projeto **Guia Verde**, uma proposta de aplicativo voltado à localização de áreas verdes urbanas, como parques, praças e hortas comunitárias.
+A atividade teve como objetivo definir e estruturar os principais elementos iniciais do projeto **VerdeUrbano**, uma proposta de aplicativo voltado à localização de áreas verdes urbanas, como parques, praças e hortas comunitárias.
 
 Durante a atividade, foram realizadas pesquisas e levantamentos para compreender melhor o público-alvo, as necessidades dos usuários e referências para o desenvolvimento da proposta.
 
