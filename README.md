@@ -1,45 +1,46 @@
-Atividade — Guia Verde
+# 🌿 Guia Verde
 
-Nome do projeto
+## Atividade
 
-Guia Verde
+Estruturação inicial do projeto **Guia Verde**.
 
-Integrantes
+---
 
-* Douglas Cruz de Araújo
-* Téssio Lima
-* João Lucas Resende
-* Nilton Linhares
-* Richard Souza
+## 👥 Integrantes
 
-Turma
+- Douglas Cruz de Araújo
+- Téssio Lima
+- João Lucas Resende
+- Nilton Linhares
+- Richard Souza
 
-GP0161NOT05A
+## 🎓 Turma
 
-Breve descrição da atividade
+**GP0161NOT05A**
 
-A atividade teve como objetivo definir e estruturar os principais elementos iniciais do projeto Guia Verde, uma proposta de aplicativo voltado à localização de áreas verdes urbanas, como parques, praças e hortas comunitárias.
+---
+
+## 📱 Sobre a atividade
+
+A atividade teve como objetivo definir e estruturar os principais elementos iniciais do projeto **Guia Verde**, uma proposta de aplicativo voltado à localização de áreas verdes urbanas, como parques, praças e hortas comunitárias.
 
 Durante a atividade, foram realizadas pesquisas e levantamentos para compreender melhor o público-alvo, as necessidades dos usuários e referências para o desenvolvimento da proposta.
 
-Responsabilidade de cada integrante na atividade
+---
 
-Douglas Cruz de Araújo
+## 📋 Responsabilidades
 
-Responsável pela elaboração e organização deste README, reunindo as informações e atividades realizadas pelo grupo durante a atividade.
+### Douglas Cruz de Araújo
+Responsável pela elaboração e organização deste **README**, reunindo as informações e atividades realizadas pelo grupo durante a atividade.
 
-Téssio Lima
+### Téssio Lima
+Responsável pela criação e definição das **personas do projeto**, representando os principais perfis de usuários da aplicação.
 
-Responsável pela criação e definição das personas do projeto, representando os principais perfis de usuários da aplicação.
+### João Lucas Resende
+Responsável pela realização das **pesquisas relacionadas ao projeto** e pelo levantamento de informações relevantes para a atividade.
 
-João Lucas Resende
+### Nilton Linhares
+Responsável pela realização do **benchmark**, analisando soluções e aplicações semelhantes como referência para o projeto.
 
-Responsável pela realização das pesquisas relacionadas ao projeto e levantamento de informações relevantes para a atividade.
-
-Nilton Linhares
-
-Responsável pela realização do benchmark, analisando soluções e aplicações semelhantes como referência para o projeto.
-
-Richard Souza
-
-Responsável, em conjunto com Téssio Lima, pela criação e definição das personas do projeto.
+### Richard Souza
+Responsável, em conjunto com Téssio Lima, pela criação e definição das **personas do projeto**.
