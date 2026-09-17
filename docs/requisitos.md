@@ -199,7 +199,6 @@ D (Excluir): Remoção de um parque ou praça da lista de favoritos (desmarcar o
 
 ## 2.5 Priorização
 
-**2.5 Priorização**
 
 As funcionalidades do VerdeUrbano foram classificadas considerando o problema identificado na pesquisa e as necessidades da persona prioritária, Marina Alves.
 
