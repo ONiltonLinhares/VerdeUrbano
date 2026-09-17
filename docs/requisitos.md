@@ -134,5 +134,66 @@ famílias com crianças, para quem essa informação é determinante na decisão
 visitar ou não um espaço.
 
 ## 2.4 CRUD
+Mapeamento do CRUD para o aplicativo Verde Urbana, focado em conectar moradores urbanos a áreas verdes (parques, praças e hortas comunitárias):
+
+**1. Perfil do Usuário**
+
+C (Criar): Cadastro inicial do usuário (nome, e-mail, senha, preferências de atividades ao ar livre).  
+
+R (Consultar): Exibição das informações do perfil e estatísticas de uso/locais visitados.
+
+U (Atualizar): Edição de dados pessoais, foto de perfil, alteração de senha e atualização de preferências.
+
+D (Excluir): Exclusão definitiva da conta e anonimização dos dados armazenados (garantindo conformidade com a LGPD).
+
+**2. Áreas Verdes (Parques, Praças e Hortas)**
+
+C (Criar): Cadastro de novos espaços verdes (realizado por administradores ou sugerido por moradores no caso de hortas comunitárias/praças não mapeadas).
+
+R (Consultar): Busca e visualização das áreas verdes no mapa ou lista, contendo detalhes de infraestrutura, horários de funcionamento, níveis de segurança, acessibilidade e rota.
+
+U (Atualizar): Edição de informações do local (ex.: mudança no horário de funcionamento, alteração na infraestrutura disponível ou inclusão de novos pontos de interesse).
+
+D (Excluir): Remoção do registro de um local caso ele seja desativado permanentemente, fechado ao público ou cadastrado em duplicidade.
+
+**3. Avaliações e Relatos de Infraestrutura / Segurança**
+
+C (Criar): Envio de comentários, notas de avaliação (estrelas), alertas de segurança em tempo real e relatos sobre as condições do local.
+
+R (Consultar): Leitura das avaliações e alertas deixados por outros usuários na página de detalhes de cada área verde.
+
+U (Atualizar): Edição do texto de um comentário ou alteração da nota previamente enviada pelo autor.
+
+D (Excluir): Exclusão do comentário pelo próprio autor ou remoção por moderadores caso o conteúdo viole as diretrizes da comunidade.
+
+**4. Fotos do Local**
+
+C (Criar): Upload de fotos tiradas pelos usuários nos locais (ex.: status da horta, preservação da praça).
+
+R (Consultar): Exibição da galeria de fotos na ficha do parque ou praça.
+
+U (Atualizar): Alteração da legenda da foto ou substituição da imagem por parte do usuário que realizou o envio.
+
+D (Excluir): Remoção da foto pelo usuário ou pela moderação (em casos de imagens impróprias ou desatualizadas).
+
+**5. Eventos e Mutirões (Hortas Comunitárias e Atividades ao Ar Livre)**
+
+C (Criar): Agendamento de eventos, como aulas de ioga, grupos de corrida, mutirões de plantio ou feiras orgânicas.
+
+R (Consultar): Visualização da agenda de eventos vinculados às áreas verdes.
+
+U (Atualizar): Alteração de data, horário ou descrição do evento pelo organizador.
+
+D (Excluir): Cancelamento e exclusão do evento da agenda comunitária.
+
+**6. Favoritos e Locais Salvos**
+
+C (Criar): Adição de uma área verde à lista pessoal de "Favoritos" ou "Quero Visitar".
+
+R (Consultar): Listagem e consulta rápida dos locais salvos pelo usuário.
+
+U (Atualizar): Não aplicável. A relação de favorito é binária (o local está na lista ou não está). Não há campos de dados editáveis nessa funcionalidade.
+
+D (Excluir): Remoção de um parque ou praça da lista de favoritos (desmarcar o item).
 
 ## 2.5 Priorização
