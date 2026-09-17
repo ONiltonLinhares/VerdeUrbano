@@ -34,13 +34,13 @@ Durante a atividade, foram realizadas pesquisas e levantamentos para compreender
 Responsável pela elaboração e organização deste **README**, reunindo as informações e atividades realizadas pelo grupo durante a atividade.
 
 ### Téssio Lima
-Responsável pela criação e definição das **personas do projeto**, representando os principais perfis de usuários da aplicação.
+Responsável pela criação e definição das **personas do projeto**, representando os principais perfis de usuários da aplicação, criação do CRUD.
 
-### João Lucas Resende
-Responsável pela realização das **pesquisas relacionadas ao projeto** e pelo levantamento de informações relevantes para a atividade.
+### João Lucas Rezende
+Responsável pela realização das **pesquisas relacionadas ao projeto** , pelo levantamento de informações relevantes para a atividade, funcionalidades, requisitos funcionais, priorização.
 
 ### Nilton Linhares
 Responsável pela realização do **benchmark**, analisando soluções e aplicações semelhantes como referência para o projeto.
 
 ### Richard Souza
-Responsável, em conjunto com Téssio Lima, pela criação e definição das **personas do projeto**.
+Responsável, em conjunto com Téssio Lima, pela criação e definição das **personas do projeto**, requisitos não funcionais.
