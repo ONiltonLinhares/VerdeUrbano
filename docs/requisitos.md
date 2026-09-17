@@ -196,4 +196,23 @@ U (Atualizar): Não aplicável. A relação de favorito é binária (o local est
 
 D (Excluir): Remoção de um parque ou praça da lista de favoritos (desmarcar o item).
 
+
 ## 2.5 Priorização
+
+**2.5 Priorização**
+
+As funcionalidades do VerdeUrbano foram classificadas considerando o problema identificado na pesquisa e as necessidades da persona prioritária, Marina Alves.
+
+**Essenciais**
+
+- **Mapa com localização, distância e acesso à rota:** permite encontrar áreas verdes próximas e chegar ao local escolhido, atendendo à proposta central do aplicativo.
+- **Página do local com informações detalhadas e acessibilidade:** permite verificar horários, estrutura e condições de acessibilidade antes da visita, ajudando o usuário a escolher um espaço adequado às suas necessidades.
+
+**Importantes**
+
+- **Filtros por atividades e estrutura:** agilizam a busca por locais adequados às preferências do usuário. Sem os filtros, ainda é possível encontrar espaços pelo mapa e consultar suas características.
+- **Avaliações e atualizações da comunidade:** complementam as informações dos locais com experiências recentes e permitem sinalizar dados desatualizados.
+
+**Secundárias**
+
+- **Consulta offline de locais salvos:** facilita o acesso às informações em áreas com conexão limitada, mas pode ser desenvolvida após as funcionalidades centrais de descoberta e planejamento de visitas.
