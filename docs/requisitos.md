@@ -1,4 +1,3 @@
-<img width="546" height="170" alt="image" src="https://github.com/user-attachments/assets/4da1ad5c-0c1f-4cc0-a763-1d8281ef61ae" /># Funcionalidades e Requisitos
 
 ## 2.1 Funcionalidades
 
