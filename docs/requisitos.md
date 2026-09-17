@@ -43,7 +43,33 @@ Para o **VerdeUrbano**, as principais funcionalidades são:
 
    **Justificativa:** A pesquisa aponta que alguns espaços podem apresentar sinal de internet insuficiente. A consulta offline permite recuperar informações como endereço, horários e estrutura durante o passeio. Pode ser implementada em uma etapa posterior, priorizando inicialmente a descoberta, a escolha e o acesso aos locais.
 
+
 ## 2.2 Requisitos funcionais
+
+**RF01 — Visualização no mapa:** O sistema deve exibir parques, praças e outras áreas verdes em um mapa, indicando a localização de cada espaço.
+
+**RF02 — Distância dos locais:** O sistema deve informar a distância entre a localização do usuário e as áreas verdes, mediante autorização de acesso à localização.
+
+**RF03 — Acesso à rota:** O sistema deve permitir que o usuário acesse a rota até a área verde selecionada.
+
+**RF04 — Filtro por atividades:** O sistema deve permitir a filtragem dos locais por atividades disponíveis, como caminhada, corrida, descanso e recreação infantil.
+
+**RF05 — Filtro por estrutura:** O sistema deve permitir a filtragem dos locais por recursos disponíveis, como bancos, banheiros, bebedouros e equipamentos esportivos.
+
+**RF06 — Detalhes do local:** O sistema deve apresentar uma página para cada área verde com fotos, endereço, horários de funcionamento, atividades e estrutura disponível.
+
+**RF07 — Informações de acessibilidade:** O sistema deve apresentar informações sobre rampas, caminhos acessíveis e banheiros adaptados, diferenciando a ausência de um recurso da falta de informação sobre ele.
+
+**RF08 — Origem e atualização dos dados:** O sistema deve exibir a origem e a data da última atualização das informações de cada local.
+
+**RF09 — Avaliações dos usuários:** O sistema deve permitir que os usuários publiquem e consultem avaliações, fotos e relatos sobre limpeza, conservação, acessibilidade e condições observadas nos locais.
+
+**RF10 — Sinalização de informações desatualizadas:** O sistema deve permitir que os usuários sinalizem informações incorretas ou desatualizadas sobre uma área verde.
+
+**RF11 — Download para consulta offline:** O sistema deve permitir que o usuário salve informações essenciais de um local e um mapa da região para consulta sem conexão com a internet.
+
+**RF12 — Acesso aos dados offline:** O sistema deve permitir a consulta dos conteúdos baixados sem conexão com a internet, exibindo a data da última atualização.
+
 
 ## 2.3 Requisitos não funcionais
 
