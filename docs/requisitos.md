@@ -43,6 +43,29 @@ Para o **VerdeUrbano**, as principais funcionalidades são:
 
    **Justificativa:** A pesquisa aponta que alguns espaços podem apresentar sinal de internet insuficiente. A consulta offline permite recuperar informações como endereço, horários e estrutura durante o passeio. Pode ser implementada em uma etapa posterior, priorizando inicialmente a descoberta, a escolha e o acesso aos locais.
 
+6. **Busca por nome ou região**
+
+   **Descrição:** Permitir a pesquisa de áreas verdes pelo nome do local, bairro ou cidade.
+   
+   **Necessidade do usuário que atende:** Encontrar um espaço específico ou explorar opções em uma região diferente da localização atual.
+   
+   **Justificativa:** Facilita o planejamento de visitas e permite que Marina procure locais sobre os quais ouviu falar, sem precisar localizá-los manualmente no mapa.
+   
+8. **Locais favoritos**
+ **Descrição:** Permitir que o usuário adicione áreas verdes a uma lista de favoritos, consulte essa lista e remova locais.
+ 
+ **Necessidade do usuário que atende:** Guardar espaços interessantes para visitar posteriormente e acessar rapidamente locais preferidos.
+ 
+ **Justificativa:** Marina utiliza o celular em pequenos intervalos e nem sempre pode visitar um local no momento em que o encontra. Os favoritos permitem retomar a escolha sem repetir a busca.
+ 
+8. **Compartilhamento de locais**
+
+ **Descrição:**  Permitir o compartilhamento do nome, endereço e link de uma área verde por aplicativos de mensagens e outras opções disponíveis no dispositivo.
+ 
+ **Necessidade do usuário que atende:**  Enviar informações de um local a outras pessoas para combinar visitas.
+ 
+ **Justificativa:** Marina também costuma sair com amigos. O compartilhamento facilita a organização desses encontros e a indicação de espaços verdes.
+
 
 ## 2.2 Requisitos funcionais
 
@@ -69,6 +92,16 @@ Para o **VerdeUrbano**, as principais funcionalidades são:
 **RF11 — Download para consulta offline:** O sistema deve permitir que o usuário salve informações essenciais de um local e um mapa da região para consulta sem conexão com a internet.
 
 **RF12 — Acesso aos dados offline:** O sistema deve permitir a consulta dos conteúdos baixados sem conexão com a internet, exibindo a data da última atualização.
+
+**RF13 — Busca por nome ou região:** O sistema deve permitir que o usuário pesquise áreas verdes pelo nome do local, bairro ou cidade.
+
+**RF14 — Adição aos favoritos:** O sistema deve permitir que o usuário adicione uma área verde à sua lista de favoritos.
+
+**RF15 — Consulta aos favoritos:** O sistema deve permitir que o usuário consulte sua lista de favoritos e acesse os detalhes dos locais salvos.
+
+**RF16 — Remoção dos favoritos:** O sistema deve permitir que o usuário remova uma área verde da sua lista de favoritos.
+
+**RF17 — Compartilhamento de locais:** O sistema deve permitir que o usuário compartilhe o nome, endereço e link de uma área verde por meio das opções de compartilhamento disponíveis no dispositivo.
 
 
 ## 2.3 Requisitos não funcionais
@@ -211,7 +244,10 @@ As funcionalidades do VerdeUrbano foram classificadas considerando o problema id
 
 - **Filtros por atividades e estrutura:** agilizam a busca por locais adequados às preferências do usuário. Sem os filtros, ainda é possível encontrar espaços pelo mapa e consultar suas características.
 - **Avaliações e atualizações da comunidade:** complementam as informações dos locais com experiências recentes e permitem sinalizar dados desatualizados.
+- **Busca por nome ou região:** facilita a localização de espaços específicos e o planejamento de visitas em outras regiões. A descoberta de locais continua possível pelo mapa.
+- **Locais favoritos:** permite guardar opções para visitas futuras e acessar rapidamente espaços preferidos, tornando o uso recorrente mais prático.
 
 **Secundárias**
 
 - **Consulta offline de locais salvos:** facilita o acesso às informações em áreas com conexão limitada, mas pode ser desenvolvida após as funcionalidades centrais de descoberta e planejamento de visitas.
+- **Compartilhamento de locais:** facilita a combinação de passeios com amigos, mas pode ser desenvolvido posteriormente, pois a descoberta, a consulta de informações e o acesso à rota funcionam sem esse recurso.
