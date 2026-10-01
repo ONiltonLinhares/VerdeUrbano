@@ -36,9 +36,18 @@
 ### Adicionado
 - Protótipo baixa fidelidade
 - Protótipo alta fidelidade
-- justificaticas.md
+- justificativas.md
 - Arquivo de apresentação das atividades realizadas
 
 ### Atualizado   
 - README do projeto
-  
+
+
+## [01/10/2026]
+
+### Adicionado
+- Apresentação final da Unidade I
+
+### Atualizado
+- Nomes dos arquivos da pasta docs, conforme a entrega final
+- Correção ortográfica do CHANGELOG
