@@ -37,7 +37,7 @@ Responsável pela elaboração e organização deste **README**, reunindo as inf
 Responsável pela criação e definição das **personas do projeto**, representando os principais perfis de usuários da aplicação, criação do CRUD.
 
 ### João Lucas Rezende
-Responsável pela realização das **pesquisas relacionadas ao projeto** , pelo levantamento de informações relevantes para a atividade, funcionalidades, requisitos funcionais, priorização.
+Responsável pela realização das pesquisas relacionadas ao projeto , pelo levantamento de informações relevantes para a atividade, funcionalidades, requisitos funcionais, priorização, criação dos protótipos de baixa e alta fidelidade e justificativas.
 
 ### Nilton Linhares
 Responsável pela realização do **benchmark**, analisando soluções e aplicações semelhantes como referência para o projeto.
