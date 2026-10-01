@@ -29,4 +29,16 @@
 
 ### Atualizado
 -README do projeto
+
+
+##[30/09/2026]
+
+### Adicionado
+- Protótipo baixa fidelidade
+- Protótipo alta fidelidade
+- justificaticas.md
+- Arquivo de apresentação das atividades realizadas
+
+### Atualizado   
+- README do projeto
   
