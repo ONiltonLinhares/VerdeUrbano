@@ -31,7 +31,7 @@
 -README do projeto
 
 
-##[30/09/2026]
+## [30/09/2026]
 
 ### Adicionado
 - Protótipo baixa fidelidade
