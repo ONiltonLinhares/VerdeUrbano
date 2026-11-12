@@ -1,0 +1,126 @@
+classDiagram
+    direction LR
+
+    class Usuario {
+        +String id
+        +String nome
+        +String email
+        +String? fotoUrl
+        +List~Atividade~ preferencias
+        +PapelUsuario papel
+        +DateTime criadoEm
+        +DateTime atualizadoEm
+        +bool get isAdmin
+        +Map toFirestore()
+        +Usuario fromFirestore(doc)
+    }
+
+    class AreaVerde {
+        +String id
+        +String nome
+        +TipoArea tipo
+        +String endereco
+        +String bairro
+        +String cidade
+        +GeoPoint localizacao
+        +List~String~ fotos
+        +Horario horario
+        +List~Atividade~ atividades
+        +Map~Recurso, Disponibilidade~ estrutura
+        +Map~RecursoAcessibilidade, Disponibilidade~ acessibilidade
+        +String fonte
+        +DateTime atualizadoEm
+        +StatusArea status
+        +ResumoAvaliacoes resumo
+        +bool get isAcessivel
+        +double distanciaAte(lat, lng)
+        +bool estaAberta(DateTime agora)
+        +Map toFirestore()
+        +AreaVerde fromFirestore(doc)
+    }
+
+    class Horario {
+        +String abre
+        +String fecha
+        +bool vinteQuatroHoras
+        +bool estaAberto(DateTime agora)
+    }
+
+    class ResumoAvaliacoes {
+        +int total
+        +double somaNotas
+        +double somaLimpeza
+        +double somaConservacao
+        +double somaAcessibilidade
+        +double get media
+        +double get mediaLimpeza
+        +double get mediaConservacao
+        +double get mediaAcessibilidade
+    }
+
+    class Avaliacao {
+        +String id
+        +String areaId
+        +String autorId
+        +String autorNome
+        +int nota
+        +int notaLimpeza
+        +int notaConservacao
+        +int notaAcessibilidade
+        +String comentario
+        +DateTime criadoEm
+        +DateTime atualizadoEm
+        +bool podeEditar(String uid)
+        +Map toFirestore()
+        +Avaliacao fromFirestore(doc)
+    }
+
+    class Favorito {
+        +String areaId
+        +String nome
+        +TipoArea tipo
+        +String? fotoCapa
+        +DateTime adicionadoEm
+        +Map toFirestore()
+        +Favorito fromFirestore(doc)
+    }
+
+    class Sinalizacao {
+        +String id
+        +String areaId
+        +String autorId
+        +String descricao
+        +StatusSinalizacao status
+        +DateTime criadoEm
+        +Map toFirestore()
+        +Sinalizacao fromFirestore(doc)
+    }
+
+    class RegistroDiario {
+        +int? id
+        +String? areaId
+        +String areaNome
+        +Humor humor
+        +List~AtividadeRealizada~ atividades
+        +String? anotacao
+        +DateTime dataHora
+        +Map toSqlite()
+        +RegistroDiario fromSqlite(row)
+    }
+
+    class LocalOffline {
+        +String areaId
+        +String dadosJson
+        +DateTime baixadoEm
+    }
+
+    Usuario "1" --> "0..*" Favorito : salva
+    Usuario "1" --> "0..*" Avaliacao : escreve
+    Usuario "1" --> "0..*" Sinalizacao : registra
+    AreaVerde "1" *-- "1" Horario
+    AreaVerde "1" *-- "1" ResumoAvaliacoes
+    AreaVerde "1" --> "0..*" Avaliacao : recebe
+    AreaVerde "1" --> "0..*" Sinalizacao : recebe
+    Favorito "0..*" --> "1" AreaVerde : referencia
+    RegistroDiario "0..*" ..> "0..1" AreaVerde : visita (só local)
+    LocalOffline "0..*" ..> "1" AreaVerde : cópia local

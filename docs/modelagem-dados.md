@@ -24,6 +24,11 @@ Elas vêm do estudo de caso e dos requisitos da Unidade I. Não são escolhas t�
 
 ## 2. Diagrama de classes (modelos de domínio)
 
+![Diagrama de classes do VerdeUrbano](diagramas/diagrama-classes.png)
+
+<details>
+<summary>Código-fonte do diagrama (Mermaid, editável)</summary>
+
 ```mermaid
 classDiagram
     direction LR
@@ -152,6 +157,10 @@ classDiagram
     RegistroDiario "0..*" ..> "0..1" AreaVerde : visita (só local)
     LocalOffline "0..*" ..> "1" AreaVerde : cópia local
 ```
+
+</details>
+
+Para regerar a imagem depois de editar: `npx @mermaid-js/mermaid-cli -i docs/diagramas/diagrama-classes.mmd -o docs/diagramas/diagrama-classes.png -b white -s 2`
 
 ### Enums
 
