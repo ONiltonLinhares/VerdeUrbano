@@ -1,0 +1,95 @@
+rules_version = '2';
+
+// Regras de segurança do Firestore — VerdeUrbano
+// Explicação de cada regra: docs/modelagem-dados.md, seção 6.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- funções auxiliares ----------
+    function logado() {
+      return request.auth != null;
+    }
+
+    function ehDono(uid) {
+      return logado() && request.auth.uid == uid;
+    }
+
+    function ehAdmin() {
+      return logado()
+        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.papel == 'admin';
+    }
+
+    function notaValida(n) {
+      return n is int && n >= 1 && n <= 5;
+    }
+
+    // ---------- usuários ----------
+    match /usuarios/{uid} {
+      allow read: if ehDono(uid) || ehAdmin();
+
+      // Ninguém nasce admin: o papel é sempre 'usuario' na criação.
+      allow create: if ehDono(uid)
+        && request.resource.data.papel == 'usuario'
+        && request.resource.data.nome is string
+        && request.resource.data.nome.size() > 0;
+
+      // O dono edita os próprios dados, mas nunca o próprio papel.
+      allow update: if ehDono(uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['papel']);
+
+      allow delete: if ehDono(uid);
+
+      match /favoritos/{areaId} {
+        allow read, create, delete: if ehDono(uid);
+      }
+    }
+
+    // ---------- áreas verdes ----------
+    match /areas_verdes/{areaId} {
+      // RNF03: consultar o mapa não exige login.
+      allow read: if resource.data.status == 'publicada' || ehAdmin();
+
+      // Morador sugere (entra como pendente); admin cadastra direto.
+      allow create: if ehAdmin()
+        || (logado() && request.resource.data.status == 'pendente');
+
+      // Admin edita tudo. Usuário logado só mexe no resumo das avaliações
+      // (atualizado na mesma transação que grava a avaliação).
+      allow update: if ehAdmin()
+        || (logado() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resumo']));
+
+      allow delete: if ehAdmin();
+
+      match /avaliacoes/{autorId} {
+        allow read: if true;
+
+        // id do documento = uid do autor → uma avaliação por pessoa por local.
+        allow create: if ehDono(autorId)
+          && request.resource.data.autorId == autorId
+          && notaValida(request.resource.data.nota)
+          && notaValida(request.resource.data.notaLimpeza)
+          && notaValida(request.resource.data.notaConservacao)
+          && notaValida(request.resource.data.notaAcessibilidade);
+
+        allow update: if ehDono(autorId)
+          && request.resource.data.autorId == autorId
+          && notaValida(request.resource.data.nota);
+
+        // Autor apaga a própria; admin modera.
+        allow delete: if ehDono(autorId) || ehAdmin();
+      }
+    }
+
+    // ---------- sinalizações (RF10) ----------
+    match /sinalizacoes/{id} {
+      allow read: if ehAdmin()
+        || (logado() && resource.data.autorId == request.auth.uid);
+
+      allow create: if logado()
+        && request.resource.data.autorId == request.auth.uid
+        && request.resource.data.status == 'pendente';
+
+      allow update, delete: if ehAdmin();
+    }
+  }
+}

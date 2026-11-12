@@ -44,3 +44,36 @@ Responsável pela realização do **benchmark**, analisando soluções e aplica�
 
 ### Richard Souza
 Responsável, em conjunto com Téssio Lima, pela criação e definição das **personas do projeto**, requisitos não funcionais.
+
+---
+
+# 📱 Unidade II — Aplicativo
+
+**Stack:** Dart · Flutter · Firebase (Authentication + Cloud Firestore), como exigido pela disciplina.
+
+## Estrutura
+
+```
+app/                        projeto Flutter
+├── lib/
+│   ├── main.dart           inicialização do Firebase e do app
+│   ├── core/tema.dart      cores e tipografia do guia visual (Unidade I)
+│   ├── models/             classes de domínio (Dart ↔ Firestore)
+│   ├── data/               banco local SQLite (diário e locais offline)
+│   └── telas/              telas do app
+├── test/                   testes automatizados
+└── firestore.rules         regras de segurança do Firestore
+docs/modelagem-dados.md     diagrama de classes, coleções do Firestore e mapeamento
+```
+
+## Como rodar
+
+1. Instale o [Flutter](https://docs.flutter.dev/get-started/install) e um emulador Android.
+2. Na pasta `app/`:
+   ```bash
+   flutter pub get
+   flutter run
+   ```
+3. Testes: `flutter test`
+
+> Enquanto o Firebase não estiver configurado (`flutterfire configure`), o app abre uma tela de aviso em vez de fechar.
