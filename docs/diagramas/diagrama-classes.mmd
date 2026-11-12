@@ -1,0 +1,167 @@
+classDiagram
+    direction LR
+
+    class Usuario {
+        +String id
+        +String nome
+        +String email
+        +String? fotoUrl
+        +List~Atividade~ preferencias
+        +PapelUsuario papel
+        +DateTime criadoEm
+        +DateTime atualizadoEm
+        +bool isAdmin()
+        +Map toFirestore()
+        +Usuario fromFirestore(doc)
+    }
+
+    class AreaVerde {
+        +String id
+        +String nome
+        +TipoArea tipo
+        +String endereco
+        +String bairro
+        +String cidade
+        +GeoPoint localizacao
+        +List~String~ fotos
+        +Horario horario
+        +List~Atividade~ atividades
+        +Map~Recurso, Disponibilidade~ estrutura
+        +Map~RecursoAcessibilidade, Disponibilidade~ acessibilidade
+        +String fonte
+        +DateTime atualizadoEm
+        +StatusArea status
+        +ResumoAvaliacoes resumo
+        +String? criadoPor
+        +bool isAcessivel()
+        +double distanciaAte(lat, lng)
+        +bool estaAberta(DateTime agora)
+        +bool correspondeBusca(String termo)
+        +Map toFirestore()
+        +AreaVerde fromFirestore(doc)
+    }
+
+    class Horario {
+        +int abreEm
+        +int fechaEm
+        +bool vinteQuatroHoras
+        +List~int~ diasAbertos
+        +bool valido()
+        +bool estaAberto(DateTime agora)
+        +String formatar(int minutos)
+    }
+
+    class ResumoAvaliacoes {
+        +int total
+        +int somaNotas
+        +int somaLimpeza
+        +int somaConservacao
+        +int somaAcessibilidade
+        +double media()
+        +ResumoAvaliacoes adicionar(Avaliacao a)
+        +ResumoAvaliacoes remover(Avaliacao a)
+        +ResumoAvaliacoes substituir(Avaliacao antiga, Avaliacao nova)
+    }
+
+    class Avaliacao {
+        +String id
+        +String areaId
+        +String autorId
+        +String autorNome
+        +int nota
+        +int notaLimpeza
+        +int notaConservacao
+        +int notaAcessibilidade
+        +String comentario
+        +DateTime criadoEm
+        +DateTime atualizadoEm
+        +bool podeEditar(String uid)
+        +Map toFirestore()
+        +Avaliacao fromFirestore(doc)
+    }
+
+    class Foto {
+        +String id
+        +String areaId
+        +String autorId
+        +String autorNome
+        +String imagemBase64
+        +String legenda
+        +DateTime criadoEm
+        +DateTime atualizadoEm
+        +Uint8List bytes()
+        +bool podeEditar(String uid)
+        +Map toFirestore()
+        +Foto fromFirestore(doc)
+    }
+
+    class Evento {
+        +String id
+        +String areaId
+        +String titulo
+        +String descricao
+        +TipoEvento tipo
+        +DateTime inicio
+        +DateTime fim
+        +String organizadorId
+        +String organizadorNome
+        +StatusEvento status
+        +bool periodoValido()
+        +bool jaAconteceu(DateTime agora)
+        +bool podeEditar(String uid)
+        +Map toFirestore()
+        +Evento fromFirestore(doc)
+    }
+
+    class Favorito {
+        +String areaId
+        +DateTime adicionadoEm
+        +Map toFirestore()
+        +Favorito fromFirestore(doc)
+    }
+
+    class Sinalizacao {
+        +String id
+        +String areaId
+        +String autorId
+        +String descricao
+        +StatusSinalizacao status
+        +DateTime criadoEm
+        +Map toFirestore()
+        +Sinalizacao fromFirestore(doc)
+    }
+
+    class RegistroDiario {
+        +int? id
+        +String? areaId
+        +String areaNome
+        +Humor humor
+        +List~AtividadeRealizada~ atividades
+        +String? anotacao
+        +DateTime dataHora
+        +Map toSqlite()
+        +RegistroDiario fromSqlite(row)
+    }
+
+    class LocalOffline {
+        +String areaId
+        +String dadosJson
+        +DateTime baixadoEm
+    }
+
+    Usuario "1" --> "0..*" Favorito : salva
+    Usuario "1" --> "0..*" Avaliacao : escreve
+    Usuario "1" --> "0..*" Foto : envia
+    Usuario "1" --> "0..*" Evento : organiza
+    Usuario "1" --> "0..*" Sinalizacao : registra
+    Usuario "1" --> "0..*" AreaVerde : sugere
+    AreaVerde "1" *-- "1" Horario
+    AreaVerde "1" *-- "1" ResumoAvaliacoes
+    AreaVerde "1" --> "0..*" Avaliacao : recebe
+    AreaVerde "1" --> "0..*" Foto : tem
+    AreaVerde "1" --> "0..*" Evento : sedia
+    AreaVerde "1" --> "0..*" Sinalizacao : recebe
+    Favorito "0..*" --> "1" AreaVerde : referencia
+    ResumoAvaliacoes ..> Avaliacao : calcula a partir de
+    RegistroDiario "0..*" ..> "0..1" AreaVerde : visita (só local)
+    LocalOffline "0..*" ..> "1" AreaVerde : cópia local
