@@ -61,6 +61,20 @@ enum PapelUsuario { usuario, admin }
 
 enum StatusSinalizacao { pendente, resolvida, rejeitada }
 
+/// CRUD 5 da Unidade I: eventos e mutirões.
+enum TipoEvento {
+  ioga('Ioga'),
+  grupoCorrida('Grupo de corrida'),
+  mutiraoPlantio('Mutirão de plantio'),
+  feiraOrganica('Feira orgânica'),
+  outro('Outro');
+
+  const TipoEvento(this.rotulo);
+  final String rotulo;
+}
+
+enum StatusEvento { agendado, cancelado }
+
 enum Humor {
   agitado('Agitado'),
   cansado('Cansado'),

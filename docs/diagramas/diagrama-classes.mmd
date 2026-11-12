@@ -10,7 +10,7 @@ classDiagram
         +PapelUsuario papel
         +DateTime criadoEm
         +DateTime atualizadoEm
-        +bool get isAdmin
+        +bool isAdmin()
         +Map toFirestore()
         +Usuario fromFirestore(doc)
     }
@@ -32,30 +32,35 @@ classDiagram
         +DateTime atualizadoEm
         +StatusArea status
         +ResumoAvaliacoes resumo
-        +bool get isAcessivel
+        +String? criadoPor
+        +bool isAcessivel()
         +double distanciaAte(lat, lng)
         +bool estaAberta(DateTime agora)
+        +bool correspondeBusca(String termo)
         +Map toFirestore()
         +AreaVerde fromFirestore(doc)
     }
 
     class Horario {
-        +String abre
-        +String fecha
+        +int abreEm
+        +int fechaEm
         +bool vinteQuatroHoras
+        +List~int~ diasAbertos
+        +bool valido()
         +bool estaAberto(DateTime agora)
+        +String formatar(int minutos)
     }
 
     class ResumoAvaliacoes {
         +int total
-        +double somaNotas
-        +double somaLimpeza
-        +double somaConservacao
-        +double somaAcessibilidade
-        +double get media
-        +double get mediaLimpeza
-        +double get mediaConservacao
-        +double get mediaAcessibilidade
+        +int somaNotas
+        +int somaLimpeza
+        +int somaConservacao
+        +int somaAcessibilidade
+        +double media()
+        +ResumoAvaliacoes adicionar(Avaliacao a)
+        +ResumoAvaliacoes remover(Avaliacao a)
+        +ResumoAvaliacoes substituir(Avaliacao antiga, Avaliacao nova)
     }
 
     class Avaliacao {
@@ -75,11 +80,41 @@ classDiagram
         +Avaliacao fromFirestore(doc)
     }
 
+    class Foto {
+        +String id
+        +String areaId
+        +String autorId
+        +String autorNome
+        +String imagemBase64
+        +String legenda
+        +DateTime criadoEm
+        +DateTime atualizadoEm
+        +Uint8List bytes()
+        +bool podeEditar(String uid)
+        +Map toFirestore()
+        +Foto fromFirestore(doc)
+    }
+
+    class Evento {
+        +String id
+        +String areaId
+        +String titulo
+        +String descricao
+        +TipoEvento tipo
+        +DateTime inicio
+        +DateTime fim
+        +String organizadorId
+        +String organizadorNome
+        +StatusEvento status
+        +bool periodoValido()
+        +bool jaAconteceu(DateTime agora)
+        +bool podeEditar(String uid)
+        +Map toFirestore()
+        +Evento fromFirestore(doc)
+    }
+
     class Favorito {
         +String areaId
-        +String nome
-        +TipoArea tipo
-        +String? fotoCapa
         +DateTime adicionadoEm
         +Map toFirestore()
         +Favorito fromFirestore(doc)
@@ -116,11 +151,17 @@ classDiagram
 
     Usuario "1" --> "0..*" Favorito : salva
     Usuario "1" --> "0..*" Avaliacao : escreve
+    Usuario "1" --> "0..*" Foto : envia
+    Usuario "1" --> "0..*" Evento : organiza
     Usuario "1" --> "0..*" Sinalizacao : registra
+    Usuario "1" --> "0..*" AreaVerde : sugere
     AreaVerde "1" *-- "1" Horario
     AreaVerde "1" *-- "1" ResumoAvaliacoes
     AreaVerde "1" --> "0..*" Avaliacao : recebe
+    AreaVerde "1" --> "0..*" Foto : tem
+    AreaVerde "1" --> "0..*" Evento : sedia
     AreaVerde "1" --> "0..*" Sinalizacao : recebe
     Favorito "0..*" --> "1" AreaVerde : referencia
+    ResumoAvaliacoes ..> Avaliacao : calcula a partir de
     RegistroDiario "0..*" ..> "0..1" AreaVerde : visita (só local)
     LocalOffline "0..*" ..> "1" AreaVerde : cópia local

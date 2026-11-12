@@ -2,10 +2,12 @@ rules_version = '2';
 
 // Regras de segurança do Firestore — VerdeUrbano
 // Explicação de cada regra: docs/modelagem-dados.md, seção 6.
+// Testes automatizados: app/firestore-tests/ (rodam no emulador do Firebase).
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---------- funções auxiliares ----------
+    // ================= funções auxiliares =================
+
     function logado() {
       return request.auth != null;
     }
@@ -23,14 +25,69 @@ service cloud.firestore {
       return n is int && n >= 1 && n <= 5;
     }
 
-    // ---------- usuários ----------
+    function textoAte(s, max) {
+      return s is string && s.size() <= max;
+    }
+
+    function caminhoArea(areaId) {
+      return /databases/$(database)/documents/areas_verdes/$(areaId);
+    }
+
+    function caminhoAvaliacao(areaId, uid) {
+      return /databases/$(database)/documents/areas_verdes/$(areaId)/avaliacoes/$(uid);
+    }
+
+    // Notas de uma avaliação, ou zero se ela não existe.
+    function notasDe(existe, doc) {
+      return existe ? doc.data
+        : {'nota': 0, 'notaLimpeza': 0, 'notaConservacao': 0, 'notaAcessibilidade': 0};
+    }
+
+    // O resumo da área só pode mudar exatamente pelo efeito da avaliação do
+    // próprio usuário, gravada na MESMA transação. Ex.: avaliação nova com
+    // nota 5 → total +1 e somaNotas +5. Qualquer outro valor é recusado.
+    function resumoCoerente(areaId) {
+      let rev = caminhoAvaliacao(areaId, request.auth.uid);
+      let existia = exists(rev);
+      let existira = existsAfter(rev);
+      let a = notasDe(existia, existia ? get(rev) : null);
+      let d = notasDe(existira, existira ? getAfter(rev) : null);
+      let antes = resource.data.resumo;
+      let depois = request.resource.data.resumo;
+      let deltaTotal = (existira ? 1 : 0) - (existia ? 1 : 0);
+      return (existia || existira)
+        && depois.keys().hasOnly(['total', 'somaNotas', 'somaLimpeza', 'somaConservacao', 'somaAcessibilidade'])
+        && depois.total == antes.total + deltaTotal
+        && depois.somaNotas == antes.somaNotas - a.nota + d.nota
+        && depois.somaLimpeza == antes.somaLimpeza - a.notaLimpeza + d.notaLimpeza
+        && depois.somaConservacao == antes.somaConservacao - a.notaConservacao + d.notaConservacao
+        && depois.somaAcessibilidade == antes.somaAcessibilidade - a.notaAcessibilidade + d.notaAcessibilidade;
+    }
+
+    function resumoZerado(r) {
+      return r.total == 0 && r.somaNotas == 0 && r.somaLimpeza == 0
+        && r.somaConservacao == 0 && r.somaAcessibilidade == 0;
+    }
+
+    function avaliacaoValida(d, autorId) {
+      return d.autorId == autorId
+        && textoAte(d.autorNome, 60)
+        && notaValida(d.nota)
+        && notaValida(d.notaLimpeza)
+        && notaValida(d.notaConservacao)
+        && notaValida(d.notaAcessibilidade)
+        && textoAte(d.comentario, 500);
+    }
+
+    // ================= usuários =================
+
     match /usuarios/{uid} {
       allow read: if ehDono(uid) || ehAdmin();
 
       // Ninguém nasce admin: o papel é sempre 'usuario' na criação.
       allow create: if ehDono(uid)
         && request.resource.data.papel == 'usuario'
-        && request.resource.data.nome is string
+        && textoAte(request.resource.data.nome, 60)
         && request.resource.data.nome.size() > 0;
 
       // O dono edita os próprios dados, mas nunca o próprio papel.
@@ -40,55 +97,133 @@ service cloud.firestore {
       allow delete: if ehDono(uid);
 
       match /favoritos/{areaId} {
-        allow read, create, delete: if ehDono(uid);
+        allow read, delete: if ehDono(uid);
+        allow create: if ehDono(uid) && exists(caminhoArea(areaId));
       }
     }
 
-    // ---------- áreas verdes ----------
+    // ================= áreas verdes =================
+
     match /areas_verdes/{areaId} {
       // RNF03: consultar o mapa não exige login.
-      allow read: if resource.data.status == 'publicada' || ehAdmin();
+      // Quem sugeriu um local acompanha a sugestão enquanto ela está pendente.
+      allow read: if resource.data.status == 'publicada'
+        || ehAdmin()
+        || (logado() && resource.data.criadoPor == request.auth.uid);
 
-      // Morador sugere (entra como pendente); admin cadastra direto.
+      // Morador sugere (entra pendente, sem avaliações); admin cadastra direto.
       allow create: if ehAdmin()
-        || (logado() && request.resource.data.status == 'pendente');
+        || (logado()
+          && request.resource.data.status == 'pendente'
+          && request.resource.data.criadoPor == request.auth.uid
+          && resumoZerado(request.resource.data.resumo));
 
-      // Admin edita tudo. Usuário logado só mexe no resumo das avaliações
-      // (atualizado na mesma transação que grava a avaliação).
+      // Admin edita tudo. Usuário logado só mexe no resumo, e só de forma
+      // coerente com a própria avaliação (ver resumoCoerente).
       allow update: if ehAdmin()
-        || (logado() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resumo']));
+        || (logado()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resumo'])
+          && resumoCoerente(areaId));
 
       allow delete: if ehAdmin();
 
+      // ---------- avaliações (CRUD 3) ----------
+      // id do documento = uid do autor → uma avaliação por pessoa por local.
       match /avaliacoes/{autorId} {
         allow read: if true;
 
-        // id do documento = uid do autor → uma avaliação por pessoa por local.
+        // Só vale junto com a atualização do resumo da área (total +1).
         allow create: if ehDono(autorId)
-          && request.resource.data.autorId == autorId
-          && notaValida(request.resource.data.nota)
-          && notaValida(request.resource.data.notaLimpeza)
-          && notaValida(request.resource.data.notaConservacao)
-          && notaValida(request.resource.data.notaAcessibilidade);
+          && avaliacaoValida(request.resource.data, autorId)
+          && getAfter(caminhoArea(areaId)).data.resumo.total
+             == get(caminhoArea(areaId)).data.resumo.total + 1;
 
+        // Mudou alguma nota → o resumo da área tem que mudar junto.
+        // Só texto/nome mudou (ex.: anonimização) → resumo fica igual.
         allow update: if ehDono(autorId)
-          && request.resource.data.autorId == autorId
-          && notaValida(request.resource.data.nota);
+          && avaliacaoValida(request.resource.data, autorId)
+          && request.resource.data.criadoEm == resource.data.criadoEm
+          && (
+            !request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny(['nota', 'notaLimpeza', 'notaConservacao', 'notaAcessibilidade'])
+            || getAfter(caminhoArea(areaId)).data.resumo != get(caminhoArea(areaId)).data.resumo
+          );
 
-        // Autor apaga a própria; admin modera.
-        allow delete: if ehDono(autorId) || ehAdmin();
+        // Autor apaga a própria; admin modera. Resumo tem que cair junto (total −1).
+        allow delete: if (ehDono(autorId) || ehAdmin())
+          && getAfter(caminhoArea(areaId)).data.resumo.total
+             == get(caminhoArea(areaId)).data.resumo.total - 1;
+      }
+
+      // ---------- fotos da comunidade (CRUD 4) ----------
+      match /fotos/{fotoId} {
+        allow read: if true;
+
+        // ~930 KB de base64 cabe no limite de 1 MiB do documento.
+        allow create: if logado()
+          && request.resource.data.autorId == request.auth.uid
+          && textoAte(request.resource.data.autorNome, 60)
+          && textoAte(request.resource.data.imagemBase64, 960000)
+          && textoAte(request.resource.data.legenda, 200);
+
+        // O autor troca legenda ou imagem; nunca o autor da foto.
+        allow update: if ehDono(resource.data.autorId)
+          && request.resource.data.autorId == resource.data.autorId
+          && textoAte(request.resource.data.imagemBase64, 960000)
+          && textoAte(request.resource.data.legenda, 200);
+
+        allow delete: if ehDono(resource.data.autorId) || ehAdmin();
+      }
+
+      // ---------- eventos e mutirões (CRUD 5) ----------
+      match /eventos/{eventoId} {
+        allow read: if true;
+
+        // Não dá para criar evento no passado nem terminando antes de começar.
+        allow create: if logado()
+          && request.resource.data.organizadorId == request.auth.uid
+          && textoAte(request.resource.data.titulo, 80)
+          && request.resource.data.titulo.size() > 0
+          && textoAte(request.resource.data.descricao, 1000)
+          && request.resource.data.inicio > request.time
+          && request.resource.data.fim > request.resource.data.inicio
+          && request.resource.data.status == 'agendado';
+
+        allow update: if ehDono(resource.data.organizadorId)
+          && request.resource.data.organizadorId == resource.data.organizadorId
+          && request.resource.data.fim > request.resource.data.inicio
+          && request.resource.data.status in ['agendado', 'cancelado'];
+
+        allow delete: if ehDono(resource.data.organizadorId) || ehAdmin();
       }
     }
 
-    // ---------- sinalizações (RF10) ----------
+    // ---------- consultas por autor em todas as áreas ----------
+    // Usadas na exclusão de conta (LGPD): achar todas as avaliações, fotos e
+    // eventos do usuário para anonimizar ou apagar.
+    match /{caminho=**}/avaliacoes/{autorId} {
+      allow read: if true;
+    }
+    match /{caminho=**}/fotos/{fotoId} {
+      allow read: if true;
+    }
+    match /{caminho=**}/eventos/{eventoId} {
+      allow read: if true;
+    }
+
+    // ================= sinalizações (RF10) =================
+
     match /sinalizacoes/{id} {
       allow read: if ehAdmin()
         || (logado() && resource.data.autorId == request.auth.uid);
 
       allow create: if logado()
         && request.resource.data.autorId == request.auth.uid
-        && request.resource.data.status == 'pendente';
+        && request.resource.data.status == 'pendente'
+        && textoAte(request.resource.data.descricao, 500)
+        && exists(caminhoArea(request.resource.data.areaId));
 
+      // Moderação: só o admin muda o status ou apaga.
       allow update, delete: if ehAdmin();
     }
   }

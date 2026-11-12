@@ -62,7 +62,8 @@ app/                        projeto Flutter
 │   ├── data/               banco local SQLite (diário e locais offline)
 │   └── telas/              telas do app
 ├── test/                   testes automatizados
-└── firestore.rules         regras de segurança do Firestore
+├── firestore.rules         regras de segurança do Firestore
+└── firestore-tests/        testes das regras no emulador (npm test, precisa de Java 21)
 docs/modelagem-dados.md     diagrama de classes, coleções do Firestore e mapeamento
 ```
 

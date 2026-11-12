@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'avaliacao.dart';
 import 'enums.dart';
 
 /// Coleção `areas_verdes/{id}`. Ver docs/modelagem-dados.md, seção 3.
@@ -22,6 +23,7 @@ class AreaVerde {
     required this.atualizadoEm,
     required this.status,
     required this.resumo,
+    this.criadoPor,
   });
 
   final String id;
@@ -31,6 +33,9 @@ class AreaVerde {
   final String bairro;
   final String cidade;
   final GeoPoint localizacao;
+
+  /// Fotos oficiais (URLs públicas, cadastradas pelo admin).
+  /// Fotos enviadas pela comunidade ficam na subcoleção `fotos`.
   final List<String> fotos;
   final Horario horario;
   final List<Atividade> atividades;
@@ -41,13 +46,18 @@ class AreaVerde {
   final StatusArea status;
   final ResumoAvaliacoes resumo;
 
+  /// uid de quem sugeriu o local (null quando cadastrado pelo admin).
+  /// Permite ao morador acompanhar a própria sugestão enquanto está pendente.
+  final String? criadoPor;
+
   /// Selo "Acessível" do card: rampa e caminho acessível confirmados.
   bool get isAcessivel =>
       acessibilidade[RecursoAcessibilidade.rampas] == Disponibilidade.tem &&
       acessibilidade[RecursoAcessibilidade.caminhosAcessiveis] ==
           Disponibilidade.tem;
 
-  /// Distância em metros (RF02).
+  /// Distância em metros (RF02). É `double` porque o GPS devolve valor
+  /// quebrado (ex.: 652,38 m).
   double distanciaAte(double latitude, double longitude) =>
       Geolocator.distanceBetween(
         latitude,
@@ -57,6 +67,15 @@ class AreaVerde {
       );
 
   bool estaAberta(DateTime agora) => horario.estaAberto(agora);
+
+  /// RF13: busca por nome, bairro ou cidade, sem diferenciar maiúscula/acento.
+  /// Feita no aparelho: o Firestore não tem busca por "contém" (ver seção 8
+  /// da modelagem).
+  bool correspondeBusca(String termo) {
+    final t = normalizarTexto(termo);
+    if (t.isEmpty) return true;
+    return normalizarTexto('$nome $bairro $cidade').contains(t);
+  }
 
   factory AreaVerde.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     return AreaVerde.fromMap(doc.id, doc.data() ?? const {});
@@ -98,6 +117,7 @@ class AreaVerde {
       status: enumPorNome(StatusArea.values, d['status'], StatusArea.pendente),
       resumo: ResumoAvaliacoes.fromMap(
           (d['resumo'] as Map?)?.cast<String, dynamic>()),
+      criadoPor: d['criadoPor'] as String?,
     );
   }
 
@@ -119,6 +139,7 @@ class AreaVerde {
         'atualizadoEm': Timestamp.fromDate(atualizadoEm),
         'status': status.name,
         'resumo': resumo.toMap(),
+        'criadoPor': criadoPor,
       };
 
   /// Versão serializável em JSON para a tabela `locais_offline`
@@ -150,51 +171,80 @@ class AreaVerde {
   }
 }
 
+/// Minúsculas e sem acento: "Praça" e "praca" passam a ser iguais na busca.
+String normalizarTexto(String s) {
+  const de = 'áàâãäéèêëíìîïóòôõöúùûüç';
+  const para = 'aaaaaeeeeiiiiooooouuuuc';
+  final buffer = StringBuffer();
+  for (final c in s.toLowerCase().trim().split('')) {
+    final i = de.indexOf(c);
+    buffer.write(i >= 0 ? para[i] : c);
+  }
+  return buffer.toString();
+}
+
 /// Embutido em `areas_verdes/{id}.horario`.
+///
+/// Horário em **minutos desde a meia-noite** (`int`), não em texto "06:00":
+/// comparar fica direto (`agora >= abreEm`) e não há texto para quebrar.
+/// 06:00 = 360 · 20:00 = 1200.
 class Horario {
   const Horario({
-    required this.abre,
-    required this.fecha,
-    required this.vinteQuatroHoras,
+    required this.abreEm,
+    required this.fechaEm,
+    this.vinteQuatroHoras = false,
+    this.diasAbertos = todosOsDias,
   });
 
-  final String abre; // "06:00"
-  final String fecha; // "20:00"
+  /// `DateTime.monday` (1) … `DateTime.sunday` (7).
+  static const todosOsDias = [1, 2, 3, 4, 5, 6, 7];
+
+  final int abreEm;
+  final int fechaEm;
   final bool vinteQuatroHoras;
+  final List<int> diasAbertos;
+
+  bool get valido =>
+      vinteQuatroHoras ||
+      (abreEm >= 0 && fechaEm <= 24 * 60 && abreEm < fechaEm);
 
   bool estaAberto(DateTime agora) {
+    if (!diasAbertos.contains(agora.weekday)) return false;
     if (vinteQuatroHoras) return true;
-    final atual = agora.hour * 60 + agora.minute;
-    final inicio = _minutos(abre);
-    final fim = _minutos(fecha);
-    if (inicio == null || fim == null) return false;
-    return atual >= inicio && atual < fim;
+    if (!valido) return false;
+    final minuto = agora.hour * 60 + agora.minute;
+    return minuto >= abreEm && minuto < fechaEm;
   }
 
-  static int? _minutos(String hhmm) {
-    final partes = hhmm.split(':');
-    if (partes.length != 2) return null;
-    final h = int.tryParse(partes[0]);
-    final m = int.tryParse(partes[1]);
-    if (h == null || m == null) return null;
-    return h * 60 + m;
+  /// 1200 → "20:00". Usado na tela ("Aberto até 20h").
+  static String formatar(int minutos) {
+    final h = (minutos ~/ 60).toString().padLeft(2, '0');
+    final m = (minutos % 60).toString().padLeft(2, '0');
+    return '$h:$m';
   }
 
   factory Horario.fromMap(Map<String, dynamic>? d) => Horario(
-        abre: d?['abre'] as String? ?? '',
-        fecha: d?['fecha'] as String? ?? '',
+        abreEm: (d?['abreEm'] as num?)?.toInt() ?? 0,
+        fechaEm: (d?['fechaEm'] as num?)?.toInt() ?? 0,
         vinteQuatroHoras: d?['vinteQuatroHoras'] as bool? ?? false,
+        diasAbertos: d?['diasAbertos'] is List
+            ? List<int>.from(d!['diasAbertos'] as List)
+            : todosOsDias,
       );
 
   Map<String, dynamic> toMap() => {
-        'abre': abre,
-        'fecha': fecha,
+        'abreEm': abreEm,
+        'fechaEm': fechaEm,
         'vinteQuatroHoras': vinteQuatroHoras,
+        'diasAbertos': diasAbertos,
       };
 }
 
-/// Embutido em `areas_verdes/{id}.resumo`. Guarda somas, não médias:
-/// uma avaliação nova só soma o valor dela (ver modelagem, seção 3.1).
+/// Embutido em `areas_verdes/{id}.resumo`.
+///
+/// Guarda **somas inteiras**, não médias: notas são `int` de 1 a 5, e soma de
+/// inteiros é inteiro — a conta fica exata, sem erro de arredondamento.
+/// A média (`double`) é calculada só na hora de mostrar.
 class ResumoAvaliacoes {
   const ResumoAvaliacoes({
     this.total = 0,
@@ -205,22 +255,44 @@ class ResumoAvaliacoes {
   });
 
   final int total;
-  final double somaNotas;
-  final double somaLimpeza;
-  final double somaConservacao;
-  final double somaAcessibilidade;
+  final int somaNotas;
+  final int somaLimpeza;
+  final int somaConservacao;
+  final int somaAcessibilidade;
 
   double get media => total == 0 ? 0 : somaNotas / total;
   double get mediaLimpeza => total == 0 ? 0 : somaLimpeza / total;
   double get mediaConservacao => total == 0 ? 0 : somaConservacao / total;
   double get mediaAcessibilidade => total == 0 ? 0 : somaAcessibilidade / total;
 
+  /// Avaliação nova: soma as notas dela e conta +1.
+  ResumoAvaliacoes adicionar(Avaliacao a) => ResumoAvaliacoes(
+        total: total + 1,
+        somaNotas: somaNotas + a.nota,
+        somaLimpeza: somaLimpeza + a.notaLimpeza,
+        somaConservacao: somaConservacao + a.notaConservacao,
+        somaAcessibilidade: somaAcessibilidade + a.notaAcessibilidade,
+      );
+
+  /// Avaliação excluída: tira as notas dela e conta −1.
+  ResumoAvaliacoes remover(Avaliacao a) => ResumoAvaliacoes(
+        total: total - 1,
+        somaNotas: somaNotas - a.nota,
+        somaLimpeza: somaLimpeza - a.notaLimpeza,
+        somaConservacao: somaConservacao - a.notaConservacao,
+        somaAcessibilidade: somaAcessibilidade - a.notaAcessibilidade,
+      );
+
+  /// Avaliação editada: troca as notas antigas pelas novas, total igual.
+  ResumoAvaliacoes substituir(Avaliacao antiga, Avaliacao nova) =>
+      remover(antiga).adicionar(nova);
+
   factory ResumoAvaliacoes.fromMap(Map<String, dynamic>? d) => ResumoAvaliacoes(
         total: (d?['total'] as num?)?.toInt() ?? 0,
-        somaNotas: (d?['somaNotas'] as num?)?.toDouble() ?? 0,
-        somaLimpeza: (d?['somaLimpeza'] as num?)?.toDouble() ?? 0,
-        somaConservacao: (d?['somaConservacao'] as num?)?.toDouble() ?? 0,
-        somaAcessibilidade: (d?['somaAcessibilidade'] as num?)?.toDouble() ?? 0,
+        somaNotas: (d?['somaNotas'] as num?)?.toInt() ?? 0,
+        somaLimpeza: (d?['somaLimpeza'] as num?)?.toInt() ?? 0,
+        somaConservacao: (d?['somaConservacao'] as num?)?.toInt() ?? 0,
+        somaAcessibilidade: (d?['somaAcessibilidade'] as num?)?.toInt() ?? 0,
       );
 
   Map<String, dynamic> toMap() => {

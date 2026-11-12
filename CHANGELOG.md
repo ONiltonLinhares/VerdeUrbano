@@ -66,3 +66,20 @@
 
 ### Atualizado
 - README com a estrutura do app e instruções para rodar
+
+
+## [12/11/2026] — Revisão da modelagem de dados
+
+### Adicionado
+- Entidades `Foto` (CRUD 4) e `Evento` (CRUD 5), que estavam definidas na Unidade I e faltavam na modelagem
+- Regras do Firestore que conferem a conta do resumo de avaliações (ninguém consegue inflar a nota de um local)
+- Validação no banco: tamanho de texto, nota de 1 a 5, evento só no futuro, favorito só de área existente
+- Testes das regras de segurança no emulador do Firebase (`app/firestore-tests/`, 39 casos)
+- Busca por nome, bairro ou cidade sem diferenciar maiúscula e acento (RF13)
+- Seções de exclusão de conta (LGPD) e de limitações conhecidas na modelagem
+
+### Alterado
+- Horário em minutos desde a meia-noite (`int`) em vez de texto, com dias de funcionamento
+- Somas do resumo de avaliações de `double` para `int` (notas são inteiras)
+- Favorito guarda só a referência da área, para não ficar desatualizado
+- Diagrama de classes regenerado
