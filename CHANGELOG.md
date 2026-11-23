@@ -83,3 +83,35 @@
 - Somas do resumo de avaliações de `double` para `int` (notas são inteiras)
 - Favorito guarda só a referência da área, para não ficar desatualizado
 - Diagrama de classes regenerado
+
+
+## [12/11/2026] — Sprint 2: telas e CRUDs
+
+### Adicionado
+- Telas do protótipo: Início, Mapa, Filtros, Página do local, Rota, Salvos e Diário
+- Login, cadastro, recuperação de senha, perfil e exclusão de conta com Firebase Auth
+- CRUDs ligados ao Firestore: áreas verdes (admin e sugestão de morador), avaliações com resumo em transação, fotos da comunidade, eventos e mutirões, favoritos
+- Sinalização de informação incorreta e área do administrador (aprovar sugestões, moderar)
+- Diário de bem-estar e cópias offline usando o SQLite (`banco_local.dart`)
+- Tratamento de falhas de conexão: faixa "Sem internet", mensagens em português, limite de tempo nas operações, cópia offline
+- Permissões de localização, câmera e galeria (Android e iOS), índices do Firestore (`firestore.indexes.json`) e `firebase.json`
+- Testes de formatação e validação (`test/formatos_test.dart`)
+- Documentação: casos de uso, fluxo de navegação, planejamento (escopo, EAP, sprints) e registro de uso de IA
+
+### Alterado
+- `main.dart`: inicia sessão, áreas e dados locais; quem já entrou vai direto para o Início
+- `login_tela.dart` e `shell_tela.dart`: placeholders trocados pelas telas reais
+- `pubspec.yaml`: dependência `image_picker`
+
+
+## [19/11/2026] — Organização do desenvolvimento
+
+### Adicionado
+- `CLAUDE.md`: stack, estrutura, comandos, convenções, regras de negócio e fluxo de Git para quem desenvolve com IA
+- `docs/roadmap.md`: fases até 10/12, roteiro de testes por funcionalidade, checklist da avaliação e riscos
+- Testes de filtros e busca (`test/filtros_test.dart`) e de widgets do Login e da acessibilidade (`test/telas_test.dart`)
+
+### Corrigido
+- Sessão lê o usuário direto do Firebase Auth: logo após o login, favoritar ou avaliar não falha mais por o stream ainda não ter avisado
+- Foto com base64 corrompido não derruba mais a página do local
+

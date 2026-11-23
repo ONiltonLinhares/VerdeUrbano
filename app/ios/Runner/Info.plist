@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Usamos sua localização para mostrar a distância até as áreas verdes. Ela não é enviada a nenhum servidor.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Para tirar fotos dos locais e compartilhar com a comunidade.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Para escolher fotos dos locais e compartilhar com a comunidade.</string>
 </dict>
 </plist>
