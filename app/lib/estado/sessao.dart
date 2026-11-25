@@ -138,16 +138,38 @@ class Sessao extends ChangeNotifier {
 
   Future<void> sair() => _auth.signOut();
 
+  /// Tempo máximo desde o último login para o Firebase aceitar apagar a conta.
+  /// Passando disso ele recusa (`requires-recent-login`); a margem é de 1 min.
+  static const _loginRecente = Duration(minutes: 4);
+
   /// Exclusão de conta (LGPD) — ordem descrita em modelagem-dados.md, 3.3:
   /// 1. busca avaliações, fotos e eventos do usuário (collection group);
   /// 2. avaliações e eventos ficam com "Usuário removido";
   /// 3. fotos são apagadas; 4. favoritos são apagados;
   /// 5. perfil é apagado; 6. conta do Firebase Auth é apagada.
-  Future<void> excluirConta() async {
+  ///
+  /// Antes de mexer em qualquer dado, confere se o Firebase vai aceitar apagar
+  /// a conta no fim (login recente). Se [senhaAtual] vier preenchida, o
+  /// usuário é autenticado de novo; sem ela, só vale quem entrou há pouco.
+  /// Os passos 2 a 5 rodam em lotes de até [_tamanhoLote] operações (o
+  /// Firestore aceita no máximo 500 por lote) e o perfil é o último a sair:
+  /// se algo falhar no meio, dá para tentar de novo.
+  Future<void> excluirConta({String? senhaAtual}) async {
     final u = user;
     if (u == null) return;
     const anonimo = 'Usuário removido';
     try {
+      if (senhaAtual != null && (u.email ?? '').isNotEmpty) {
+        await comLimiteDeTempo(u.reauthenticateWithCredential(
+            EmailAuthProvider.credential(
+                email: u.email!, password: senhaAtual)));
+      } else {
+        final login = (await comLimiteDeTempo(u.getIdTokenResult())).authTime;
+        if (login == null || DateTime.now().difference(login) > _loginRecente) {
+          throw FirebaseAuthException(code: 'requires-recent-login');
+        }
+      }
+
       final avaliacoes = await _db
           .collectionGroup('avaliacoes')
           .where('autorId', isEqualTo: u.uid)
@@ -162,26 +184,30 @@ class Sessao extends ChangeNotifier {
           .get();
       final favoritos = await _doc(u.uid).collection('favoritos').get();
 
-      final lote = _db.batch();
-      for (final a in avaliacoes.docs) {
-        lote.update(a.reference, {'autorNome': anonimo});
+      final operacoes = <void Function(WriteBatch)>[
+        for (final a in avaliacoes.docs)
+          (b) => b.update(a.reference, {'autorNome': anonimo}),
+        for (final e in eventos.docs)
+          (b) => b.update(e.reference, {'organizadorNome': anonimo}),
+        for (final f in fotos.docs) (b) => b.delete(f.reference),
+        for (final f in favoritos.docs) (b) => b.delete(f.reference),
+        (b) => b.delete(_doc(u.uid)), // por último
+      ];
+      for (var i = 0; i < operacoes.length; i += _tamanhoLote) {
+        final lote = _db.batch();
+        for (final op in operacoes.skip(i).take(_tamanhoLote)) {
+          op(lote);
+        }
+        await comLimiteDeTempo(lote.commit(),
+            limite: const Duration(seconds: 30));
       }
-      for (final e in eventos.docs) {
-        lote.update(e.reference, {'organizadorNome': anonimo});
-      }
-      for (final f in fotos.docs) {
-        lote.delete(f.reference);
-      }
-      for (final f in favoritos.docs) {
-        lote.delete(f.reference);
-      }
-      lote.delete(_doc(u.uid));
-      await comLimiteDeTempo(lote.commit(), limite: const Duration(seconds: 30));
       await u.delete();
     } catch (e) {
       throw ErroApp(mensagemDeErro(e));
     }
   }
+
+  static const _tamanhoLote = 400;
 
   @override
   void dispose() {

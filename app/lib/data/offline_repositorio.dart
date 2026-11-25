@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../core/erros.dart';
 import '../models/area_verde.dart';
 import 'banco_local.dart';
 
@@ -35,49 +36,69 @@ class OfflineRepositorio extends ChangeNotifier {
       .map((l) => utf8.encode(jsonEncode(l.area.toJsonOffline())).length)
       .fold(0, (a, b) => a + b);
 
+  /// Lê a tabela. Falha de leitura não derruba o app: mantém o que já estava
+  /// na memória e registra o motivo.
   Future<void> carregar() async {
-    final db = await BancoLocal.instancia.db;
-    final linhas = await db.query('locais_offline');
-    _locais.clear();
-    for (final l in linhas) {
-      try {
-        final id = l['area_id'] as String;
-        final dados = jsonDecode(l['dados_json'] as String) as Map<String, dynamic>;
-        _locais[id] = LocalOffline(
-          AreaVerde.fromMap(id, dados),
-          DateTime.parse(l['baixado_em'] as String),
-        );
-      } catch (_) {
-        // linha corrompida: ignora em vez de derrubar o app
+    try {
+      final db = await BancoLocal.instancia.db;
+      final linhas = await db.query('locais_offline');
+      _locais.clear();
+      for (final l in linhas) {
+        try {
+          final id = l['area_id'] as String;
+          final dados =
+              jsonDecode(l['dados_json'] as String) as Map<String, dynamic>;
+          _locais[id] = LocalOffline(
+            AreaVerde.fromMap(id, dados),
+            DateTime.parse(l['baixado_em'] as String),
+          );
+        } catch (_) {
+          // linha corrompida: ignora em vez de derrubar o app
+        }
       }
+    } catch (e) {
+      debugPrint('Offline: não foi possível ler os locais salvos ($e)');
     }
     notifyListeners();
   }
 
+  /// Grava a cópia e, na mesma transação, descarta as que passam de
+  /// [maxLocais] (as mais antigas saem primeiro).
   Future<void> salvar(AreaVerde area) async {
-    final db = await BancoLocal.instancia.db;
-    await db.insert(
-      'locais_offline',
-      {
-        'area_id': area.id,
-        'dados_json': jsonEncode(area.toJsonOffline()),
-        'baixado_em': DateTime.now().toIso8601String(),
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-    await carregar();
-    final lista = locais;
-    if (lista.length > maxLocais) {
-      for (final antigo in lista.sublist(maxLocais)) {
-        await remover(antigo.area.id, recarregar: false);
-      }
-      await carregar();
+    try {
+      final db = await BancoLocal.instancia.db;
+      await db.transaction((txn) async {
+        await txn.insert(
+          'locais_offline',
+          {
+            'area_id': area.id,
+            'dados_json': jsonEncode(area.toJsonOffline()),
+            'baixado_em': DateTime.now().toIso8601String(),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+        await txn.delete(
+          'locais_offline',
+          where: 'area_id NOT IN (SELECT area_id FROM locais_offline '
+              'ORDER BY baixado_em DESC LIMIT ?)',
+          whereArgs: [maxLocais],
+        );
+      });
+    } catch (_) {
+      throw const ErroApp(
+          'Não foi possível salvar no aparelho. Verifique o espaço de armazenamento.');
     }
+    await carregar();
   }
 
   Future<void> remover(String areaId, {bool recarregar = true}) async {
-    final db = await BancoLocal.instancia.db;
-    await db.delete('locais_offline', where: 'area_id = ?', whereArgs: [areaId]);
+    try {
+      final db = await BancoLocal.instancia.db;
+      await db.delete('locais_offline',
+          where: 'area_id = ?', whereArgs: [areaId]);
+    } catch (_) {
+      throw const ErroApp('Não foi possível remover do aparelho.');
+    }
     if (recarregar) await carregar();
   }
 }
