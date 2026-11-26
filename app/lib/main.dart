@@ -14,6 +14,13 @@ import 'telas/firebase_pendente_tela.dart';
 import 'telas/login_tela.dart';
 import 'telas/shell_tela.dart';
 
+/// Só para desenvolvimento, sem acesso ao projeto real do Firebase:
+/// `flutter run --dart-define=EMULADOR=true` usa o Emulator Suite local
+/// (Firestore na 8080, Auth na 9099). Sem a flag, nada muda.
+const _usarEmulador = bool.fromEnvironment('EMULADOR');
+const _hostEmulador =
+    String.fromEnvironment('HOST_EMULADOR', defaultValue: 'localhost');
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -34,6 +41,16 @@ Future<void> main() async {
     // Cache local do Firestore: o que já foi visto continua disponível sem
     // internet (RNF05). No Android/iOS já vem ligado; aqui fica explícito.
     FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+    // Depois do `settings`, para ele não sobrescrever o endereço do emulador.
+    if (_usarEmulador) {
+      // automaticHostMapping: false → mantém "localhost" (o celular chega ao
+      // PC por `adb reverse`); o padrão trocaria por 10.0.2.2, que só existe
+      // no emulador do Android Studio.
+      FirebaseFirestore.instance.useFirestoreEmulator(_hostEmulador, 8080,
+          automaticHostMapping: false);
+      await FirebaseAuth.instance
+          .useAuthEmulator(_hostEmulador, 9099, automaticHostMapping: false);
+    }
     logado = FirebaseAuth.instance.currentUser != null;
     Sessao.instancia.iniciar();
     AreasEstado.instancia.iniciar();
