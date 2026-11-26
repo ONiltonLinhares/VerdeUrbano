@@ -183,7 +183,7 @@ class _PerfilTelaState extends State<PerfilTela> {
               ),
               if (sessao.isAdmin) ...[
                 const SizedBox(height: 20),
-                FilledButton.tonalIcon(
+                FilledButton.icon(
                   onPressed: () => abrir(context, const AdminTela()),
                   icon: const Icon(Icons.admin_panel_settings_outlined),
                   label: const Text('Área do administrador'),

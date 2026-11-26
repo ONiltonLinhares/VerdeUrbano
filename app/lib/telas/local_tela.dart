@@ -624,7 +624,7 @@ class _SecaoAvaliacoesState extends State<_SecaoAvaliacoes> {
           final lista = snap.data ?? const <Avaliacao>[];
           final minha = lista.where((a) => a.autorId == sessao.uid).firstOrNull;
           return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            FilledButton.tonalIcon(
+            FilledButton.icon(
               onPressed: _avaliar,
               icon: Icon(minha == null ? Icons.rate_review_outlined : Icons.edit_outlined),
               label: Text(minha == null ? 'Avaliar este local' : 'Editar minha avaliação'),
