@@ -4,4 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Só no debug: o Auth Emulator local fala HTTP sem criptografia, que o
+         Android bloqueia por padrão. O build de release não é afetado. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>
